@@ -1,0 +1,53 @@
+{
+  "name": "ziron-integration-tests",
+  "version": "0.1.0",
+  "description": "Integration tests for testing Ziron.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "test": "jest --runInBand"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ZironServer/ziron-integration-tests.git"
+  },
+  "author": {
+    "name": "Luca Scaringella",
+    "email": "lucacode1@gmail.com",
+    "url": "https://luca.scaringella.de"
+  },
+  "bugs": {
+    "url": "https://github.com/ZironServer/ziron-integration-tests/issues"
+  },
+  "homepage": "https://github.com/ZironServer/ziron-integration-tests#readme",
+  "dependencies": {
+    "ziron-state": "^0.1.8",
+    "ziron-broker": "^0.1.8",
+    "ziron-server": "^0.1.7",
+    "ziron-client": "^0.1.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.13",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.3.5",
+    "jest-each": "^27.0.6"
+  },
+  "keywords": [
+    "websocket",
+    "realtime",
+    "ziron",
+    "fast",
+    "lightway"
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!variables/.*)"
+    ]
+  }
+}
