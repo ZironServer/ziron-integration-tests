@@ -57,4 +57,14 @@ describe('Cluster management tests', () => {
         const servers = cluster.getServers();
         expect(servers.every(server => server.shared === servers[0].shared)).toBe(true);
     });
+
+    it("All workers/nodes should have the same auth keys in a cluster.", async () => {
+        await waitMs(200);
+        const servers = cluster.getServers();
+        expect(servers.every(server =>
+            server.auth.options.publicKey === servers[0].auth.options.publicKey &&
+            server.auth.options.privateKey === servers[0].auth.options.privateKey &&
+            server.auth.options.algorithm === servers[0].auth.options.algorithm
+        )).toBe(true);
+    });
 });
