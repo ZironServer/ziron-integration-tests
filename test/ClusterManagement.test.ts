@@ -67,4 +67,14 @@ describe('Cluster management tests', () => {
             server.auth.options.algorithm === servers[0].auth.options.algorithm
         )).toBe(true);
     });
+
+    it("All workers/nodes should have the same cluster session id in a cluster.", async () => {
+        await waitMs(200);
+        const servers = cluster.getServers();
+
+        expect(typeof servers[0].stateClient?.clusterSessionId).toBe('string');
+        expect(servers.every(server =>
+            server.stateClient?.clusterSessionId === servers[0].stateClient?.clusterSessionId)
+        ).toBe(true);
+    });
 });
