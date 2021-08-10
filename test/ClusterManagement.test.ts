@@ -11,11 +11,15 @@ jest.setTimeout(18000);
 
 describe('Cluster management tests', () => {
 
-    const WORKER_PORTS = [3020,3021,3022,3023];
     let cluster = new Cluster();
     beforeEach(async () => {
         await cluster.init(5);
-        await cluster.addServers(WORKER_PORTS);
+        await Promise.all([
+            cluster.addServer({port: 3020, clusterShared: 'hello'}),
+            cluster.addServer({port: 3021, clusterShared: 'key'}),
+            cluster.addServer({port: 3022, clusterShared: 'secret'}),
+            cluster.addServer({port: 3023, clusterShared: 'password'}),
+        ])
     })
     afterEach(async () => cluster.terminate());
 
@@ -46,5 +50,11 @@ describe('Cluster management tests', () => {
 
         const leaders = cluster.getServers().filter(server => server.leader);
         expect(leaders.length).toBe(1);
+    });
+
+    it("All workers/nodes should have the same cluster shared data.", async () => {
+        await waitMs(200);
+        const servers = cluster.getServers();
+        expect(servers.every(server => server.shared === servers[0].shared)).toBe(true);
     });
 });
