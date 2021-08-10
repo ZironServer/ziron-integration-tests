@@ -4,7 +4,7 @@ GitHub: LucaCode
 Copyright(c) Luca Scaringella
  */
 
-import {Server, ServerOptions} from "ziron-server";
+import {Server, ServerOptions} from "ziron-worker";
 import {BrokerServer} from "ziron-broker";
 import {StateServer} from "ziron-state";
 
@@ -47,8 +47,8 @@ export default class Cluster {
         await worker.listen();
     }
 
-    async addServers(ports: number[]) {
-        return Promise.all(ports.map(port => this.addServer(port)));
+    async addServers(ports: number[],options: ServerOptions = {}) {
+        return Promise.all(ports.map(port => this.addServer({...options,port})));
     }
 
     getServers(): Server[] {
