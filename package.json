@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/ZironServer/ziron-integration-tests#readme",
   "dependencies": {
-    "ziron-state": "^0.1.10",
-    "ziron-broker": "^0.1.10",
-    "ziron-worker": "^0.1.2",
-    "ziron-client": "^0.1.6"
+    "ziron-state": "^0.1.11",
+    "ziron-broker": "^0.1.11",
+    "ziron-worker": "^0.1.3",
+    "ziron-client": "^0.1.7"
   },
   "devDependencies": {
     "@types/jest": "^26.0.24",
