@@ -12,7 +12,7 @@ export default class ClientHelper {
 
     constructor() {}
 
-    getClient(port: number,index: number = 0): Socket | undefined {
+    getClient(port: number,index: number = 0): Socket{
         return this.clients[port][index];
     }
 
