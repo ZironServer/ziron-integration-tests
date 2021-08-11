@@ -13,7 +13,7 @@ export default class Cluster {
     private running: boolean = false;
     private brokers: BrokerServer[] = [];
     private workers: Server[] = [];
-    private state: StateServer;
+    private state: StateServer | null;
 
     async init(brokerCount: number = 5) {
         if(this.running) this.terminate();
@@ -36,15 +36,16 @@ export default class Cluster {
         this.running = true;
     }
 
-    async addServer(options?: ServerOptions)
-    async addServer(port: number)
-    async addServer(p: ServerOptions | number) {
+    async addServer(options?: ServerOptions): Promise<Server>
+    async addServer(port: number): Promise<Server>
+    async addServer(p: ServerOptions | number = {}): Promise<Server> {
         if(!this.running) throw new Error("Cluster is not initialized yet");
         const options = typeof p === 'number' ? {port: p} as ServerOptions : p;
-        options.join = this.state.joinToken;
+        options.join = this.state!.joinToken;
         const worker = new Server(options);
         this.workers.push(worker);
         await worker.listen();
+        return worker;
     }
 
     async addServers(ports: number[],options: ServerOptions = {}) {
