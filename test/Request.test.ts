@@ -54,6 +54,27 @@ describe('Request tests', () => {
                 const resp = await client.invoke("test",data,{processComplexTypes: complexDataType});
                 expect(resp).toStrictEqual(data);
             })
+
+        it("Should receive all 50000 invoke responses", async () => {
+            const client = clientHelper.getClient(3020);
+            let increaseCounter;
+            const promise = new Promise<void>((res,rej) => {
+                let receivedCounter = 0;
+                const timeout = setTimeout(() => {
+                    rej(new Error("Timeout reached"));
+                },10000);
+                increaseCounter = () => {
+                    receivedCounter++;
+                    if(receivedCounter === 50000) {
+                        res();
+                        clearTimeout(timeout);
+                    }
+                }
+            })
+            for(let i = 0; i < 50000; i++)
+                client.invoke("test",{}).then(increaseCounter);
+            await promise;
+        })
     });
 
     describe("Transmits",() => {
