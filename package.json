@@ -4,7 +4,7 @@
   "description": "Integration tests for testing Ziron.",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "jest --runInBand"
+    "test": "jest --runInBand --no-cache"
   },
   "repository": {
     "type": "git",
@@ -25,12 +25,16 @@
     "ziron-client": "^1.8.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
+    "@types/jest": "^27.0.3",
     "@types/node": "^16.4.13",
-    "jest": "^27.0.6",
-    "ts-jest": "^27.0.4",
-    "typescript": "^4.3.5",
-    "jest-each": "^27.0.6"
+    "jest": "^27.4.5",
+    "jest-each": "^27.4.2",
+    "ts-jest": "^27.1.1",
+    "@babel/core": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "babel-jest": "^27.4.5",
+    "@babel/preset-typescript": "^7.16.5",
+    "typescript": "^4.3.5"
   },
   "keywords": [
     "websocket",
@@ -38,15 +42,5 @@
     "ziron",
     "fast",
     "lightway"
-  ],
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "transform": {
-      "node_modules/variables/.+\\.(j|t)sx?$": "ts-jest"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!variables/.*)"
-    ]
-  }
+  ]
 }
