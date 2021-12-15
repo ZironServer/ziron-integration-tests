@@ -63,7 +63,7 @@ export default class Cluster {
            if (index !== -1) this.workers.splice(index, 1);
        }
        else {
-           this.workers.forEach(broker => broker.terminate());
+           this.workers.forEach(worker => worker.terminate());
            this.workers = [];
            this.brokers.forEach(broker => broker.terminate());
            this.brokers = [];
