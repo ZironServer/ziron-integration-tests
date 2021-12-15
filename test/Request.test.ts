@@ -7,7 +7,7 @@ Copyright(c) Ing. Luca Gian Scaringella
 import Cluster from "./utils/Cluster";
 import ClientHelper from "./utils/ClientHelper";
 import each from "jest-each";
-import {DataType} from "ziron-engine";
+import {DataType} from "ziron-client";
 
 describe('Request tests', () => {
 
