@@ -59,4 +59,31 @@ describe('Transmits tests', () => {
             expect(respData).toStrictEqual(data);
         });
 
+    each([
+        [
+            "chat",
+            false
+        ],
+        [
+            {car: {color: 'black'},persons: [{name: 'Tom'}]},
+            false
+        ],
+        [
+            new ArrayBuffer(20),
+            true
+        ],
+    ]).it("Clients from a group should get the transmit into the group - %#",
+        async (data: any, complexDataType: boolean) => {
+            const clients = clientHelper.getClients(3020);
+            const receivePromises = clients.map(client => {
+                return new Promise<any>(res => {
+                    client.receivers.news = (data) => res(data)
+                })
+            });
+            await transmitIntoGroup("news",data,complexDataType);
+            await Promise.all(receivePromises.map(p => p.then(receivedData => {
+                expect(receivedData).toStrictEqual(data);
+            })));
+        });
+
 });
