@@ -8,16 +8,37 @@ import Cluster from "./utils/Cluster";
 import ClientHelper from "./utils/ClientHelper";
 import each from "jest-each";
 import {DataType} from "ziron-client";
+import {Socket} from "ziron-worker";
+
+const TRANSMIT_TEST_DATA = [
+    [
+        "chat",
+        false
+    ],
+    [
+        {car: {color: 'black'},persons: [{name: 'Tom'}]},
+        false
+    ],
+    [
+        new ArrayBuffer(20),
+        true
+    ]
+];
 
 describe('Transmits tests', () => {
 
     let cluster = new Cluster();
-    let transmitIntoGroup: (receiver: string,msg: any,processComplexTypes: boolean) => void;
+    let transmitToGroup: (receiver: string,msg: any,processComplexTypes: boolean,skipRandomMember?: boolean) => void;
     beforeAll(async () => {
         await cluster.init(1);
         const server = await cluster.addServer(3020);
-        transmitIntoGroup = (receiver, msg, processComplexTypes) => {
-            server.transmitToGroup('group',receiver,msg,{processComplexTypes});
+        transmitToGroup = (receiver, msg, processComplexTypes,skipRandomMember) => {
+            let skipMember;
+            if(skipRandomMember) {
+                skipMember = Object.values(server.clients)[0];
+                if(!skipMember) throw new Error("No socket available to skip");
+            }
+            server.transmitToGroup('group',receiver,msg,{processComplexTypes,skipMember});
         }
         server.connectionHandler = (socket) => {
             socket.join('group');
@@ -35,20 +56,7 @@ describe('Transmits tests', () => {
     });
     afterEach(() => clientHelper.clear());
 
-    each([
-        [
-            "chat",
-            false
-        ],
-        [
-            {car: {color: 'black'},persons: [{name: 'Tom'}]},
-            false
-        ],
-        [
-            new ArrayBuffer(20),
-            true
-        ],
-    ]).it("Should receive the sent data to the receiver back with another transmit - %#",
+    each(TRANSMIT_TEST_DATA).it("Should receive the sent data to the receiver back with another transmit - %#",
         async (data: any, complexDataType: boolean) => {
             const client = clientHelper.getClient(3020);
             const resp = new Promise((res) => {
@@ -59,20 +67,7 @@ describe('Transmits tests', () => {
             expect(respData).toStrictEqual(data);
         });
 
-    each([
-        [
-            "chat",
-            false
-        ],
-        [
-            {car: {color: 'black'},persons: [{name: 'Tom'}]},
-            false
-        ],
-        [
-            new ArrayBuffer(20),
-            true
-        ],
-    ]).it("Clients from a group should get the transmit into the group - %#",
+    each(TRANSMIT_TEST_DATA).it("Clients from a group should get the transmit into the group - %#",
         async (data: any, complexDataType: boolean) => {
             const clients = clientHelper.getClients(3020);
             const receivePromises = clients.map(client => {
@@ -80,10 +75,28 @@ describe('Transmits tests', () => {
                     client.receivers.news = (data) => res(data)
                 })
             });
-            await transmitIntoGroup("news",data,complexDataType);
+            await transmitToGroup("news",data,complexDataType);
             await Promise.all(receivePromises.map(p => p.then(receivedData => {
                 expect(receivedData).toStrictEqual(data);
             })));
+        });
+
+
+    each(TRANSMIT_TEST_DATA).it("Clients from a group should get the transmit into the group except the skipped member - %#",
+        async (data: any, complexDataType: boolean) => {
+            const clients = clientHelper.getClients(3020);
+
+            let receiveCount = 0;
+            clients.forEach(client => {
+                client.receivers.news = () => {receiveCount++;}
+            });
+
+            await transmitToGroup("news",data,complexDataType,true);
+
+            //wait some time
+            await new Promise(r => setTimeout(r,200));
+
+            expect(receiveCount).toStrictEqual(clients.length - 1);
         });
 
 });
