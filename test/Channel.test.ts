@@ -82,11 +82,11 @@ describe('Channel tests', () => {
         beforeAll(async () => {
             await cluster.init(5);
             await cluster.addServer({
-                port: 3001,
+                port: 3031,
                 publishToPublisher: true,
             });
             await cluster.addServer({
-                port: 3002,
+                port: 3032,
                 publishToPublisher: false,
             })
         })
@@ -94,13 +94,13 @@ describe('Channel tests', () => {
 
         let clientHelper = new ClientHelper();
         beforeEach(async () => {
-            clientHelper.createClients([3001,3002]);
+            clientHelper.createClients([3031,3032]);
             await clientHelper.connectAll();
         });
         afterEach(() => clientHelper.clear());
 
         it("Should not get its own publish when the option is deactivated", async () => {
-            const socket = clientHelper.getClient(3002);
+            const socket = clientHelper.getClient(3032);
             await socket.subscribe("chat1");
             const mockPublishEvent = jest.fn();
             socket.onPublish("chat1",mockPublishEvent);
@@ -110,7 +110,7 @@ describe('Channel tests', () => {
         });
 
         it("Should get its own publish when the option is activated", async () => {
-            const socket = clientHelper.getClient(3001);
+            const socket = clientHelper.getClient(3031);
             await socket.subscribe("chat2");
             const mockPublishEvent = jest.fn();
             socket.onPublish("chat2",mockPublishEvent);
@@ -126,7 +126,7 @@ describe('Channel tests', () => {
         beforeAll(async () => {
             await cluster.init(5);
             await cluster.addServer({
-                port: 3002,
+                port: 3035,
                 allowClientPublish: false
             })
         })
@@ -134,14 +134,14 @@ describe('Channel tests', () => {
 
         let clientHelper = new ClientHelper();
         beforeEach(async () => {
-            clientHelper.createClient(3002)
+            clientHelper.createClient(3035)
             await clientHelper.connectAll();
         });
         afterEach(() => clientHelper.clear());
 
         it("Should not be able to publish with allowClientPublish option disabled", async () => {
-            const socket1 = clientHelper.getClient(3002);
-            const socket2 = clientHelper.getClient(3002,1);
+            const socket1 = clientHelper.getClient(3035);
+            const socket2 = clientHelper.getClient(3035,1);
 
             await socket2.subscribe("chat");
             const mockPublishEvent = jest.fn();
