@@ -44,7 +44,7 @@ export default class Cluster {
         options.join = this.state!.joinToken;
         const worker = new Server(options);
         this.workers.push(worker);
-        await worker.listenAndJoin();
+        await worker.joinAndListen();
         return worker;
     }
 
