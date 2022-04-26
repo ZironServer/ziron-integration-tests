@@ -32,7 +32,7 @@ export default class Cluster {
             });
             brokerStartPort++;
         }
-        await Promise.all(this.brokers.map(broker => broker.joinAndListen()));
+        await Promise.all(this.brokers.map(broker => broker.listenAndJoin()));
         this.running = true;
     }
 
@@ -44,7 +44,7 @@ export default class Cluster {
         options.join = this.state!.joinToken;
         const worker = new Server(options);
         this.workers.push(worker);
-        await worker.listen();
+        await worker.listenAndJoin();
         return worker;
     }
 
