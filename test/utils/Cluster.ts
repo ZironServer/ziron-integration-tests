@@ -42,7 +42,7 @@ export default class Cluster {
         if(!this.running) throw new Error("Cluster is not initialized yet");
         const options = typeof p === 'number' ? {port: p} as ServerOptions : p;
         options.join = this.state!.joinToken;
-        const worker = new Server(options);
+        const worker = new Server({...options,logLevel: 0});
         this.workers.push(worker);
         await worker.joinAndListen();
         return worker;
