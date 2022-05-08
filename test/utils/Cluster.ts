@@ -19,7 +19,8 @@ export default class Cluster {
         if(this.running) this.terminate();
         this.state = new StateServer({
             secret: '',
-            logLevel: 0
+            logLevel: 0,
+            initScaleDelay: 10
         });
         await this.state.listen();
 
