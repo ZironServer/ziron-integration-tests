@@ -57,6 +57,22 @@ export default class Cluster {
         return this.workers;
     }
 
+    getBrokers(): BrokerServer[] {
+        return this.brokers;
+    }
+
+    terminateBroker(index: number) {
+        const broker = this.brokers[index];
+        if(!broker) return;
+        broker.terminate();
+        this.brokers.splice(index,1);
+    }
+
+    terminateState() {
+        this.state?.terminate();
+        this.state = null;
+    }
+
     terminate(server?: Server) {
        if(server) {
            server.terminate();
