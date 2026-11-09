@@ -8,6 +8,7 @@ import Cluster from "./utils/Cluster";
 import ClientHelper from "./utils/ClientHelper";
 import {waitMs} from "./utils/Wait";
 import {Server} from "ziron-worker";
+import {Socket} from "ziron-client";
 
 jest.setTimeout(20000);
 
@@ -86,5 +87,33 @@ describe('Reconnect tests', () => {
         await waitMs(300);
         expect(server.clientCount).toBe(2);
         expect(Object.keys(server.clients).length).toBe(2);
+    });
+
+    it("Should drop a connection whose ping timeout passed by the wall clock when the page becomes visible.", async () => {
+        //A device that slept: its timers stood still, the wall clock went on.
+        const document = Object.assign(new EventTarget(),{visibilityState: 'visible'});
+        (globalThis as any).document = document;
+        const now = Date.now;
+        const socket = new Socket({hostname: 'localhost', port: PORT});
+        try {
+            await socket.connect();
+            const disconnectListener = jest.fn();
+            socket.on('disconnect',disconnectListener);
+
+            document.dispatchEvent(new Event('visibilitychange'));
+            expect(disconnectListener).not.toHaveBeenCalled();
+
+            Date.now = () => now() + 60000;
+            document.dispatchEvent(new Event('visibilitychange'));
+            expect(disconnectListener).toHaveBeenCalledWith(4000,expect.anything());
+            Date.now = now;
+            await socket.once('connect',2000);
+            expect(socket.isConnected()).toBe(true);
+        }
+        finally {
+            Date.now = now;
+            delete (globalThis as any).document;
+            socket.disconnect();
+        }
     });
 });
