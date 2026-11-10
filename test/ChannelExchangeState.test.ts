@@ -63,6 +63,16 @@ describe('Channel exchange state tests', () => {
         }
     });
 
+    it("Should tell the other workers when a worker left the cluster.", async () => {
+        await cluster.init(1);
+        const [stays, leaves] = await cluster.addServers([3113, 3114]);
+        const left: (string | undefined)[] = [];
+        stays.stateClient!.on('workerLeave', id => left.push(id));
+        cluster.terminate(leaves);
+        await waitUntil(() => left.length > 0);
+        expect(left).toEqual([leaves.id]);
+    });
+
     it("Should tell about a publish that found no broker.", async () => {
         await cluster.init(1);
         const server = await cluster.addServer(3112);
