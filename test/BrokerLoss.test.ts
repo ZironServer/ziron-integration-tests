@@ -99,6 +99,22 @@ describe('Broker loss tests', () => {
         expect(subscriber.received.length === 1 || publisher.losses.includes('flight')).toBe(true);
     });
 
+    it("Should tell about a publish sent after the connection broke and before the socket saw it.", async () => {
+        const subscriber = await pool(false);
+        const publisher = await pool(true);
+        await subscriber.pool.subscribe('window');
+        await waitMs(100);
+        //the socket of the publisher sees the break only in a later turn: the publish goes into a dead connection
+        publisher.proxy!.drop();
+        expect(publisher.pool.isConnected()).toBe(true);
+        publisher.pool.publish('window',1);
+        await waitUntil(() => publisher.losses.length > 0 || subscriber.received.length > 0);
+        await waitUntil(() => publisher.pool.isConnected());
+        await waitMs(300);
+        //either it arrived or the publisher knows that it may not have
+        expect(subscriber.received.length === 1 || publisher.losses.includes('window')).toBe(true);
+    });
+
     it("Should not tell about a loss when the broker confirmed the publishes.", async () => {
         const subscriber = await pool(false);
         const publisher = await pool(true);
